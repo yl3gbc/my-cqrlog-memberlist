@@ -15,11 +15,12 @@ services:
     #image: librespace/satnogs-client:master-unstable  # LSF experimental docker image
     #image: librespace/satnogs-client:lsf-addons  # LSF stable + gr-satellites and addons
     #image: librespace/satnogs-client:lsf-dev-addons  # LSF unstable + gr-satellites and addons
-    image: knegge/satnogs-client:1.9.2-addons
+    image: knegge/satnogs-client:1.9.3-addons
     #image: knegge/satnogs-client:sa2kng-addons
     #image: knegge/satnogs-client:lsf-dev-addons
     user: '999'
-    read_only: true
+    #read_only: true
+    command: liveupdate-satyaml.sh satnogs-client
     init: true  # init is needed when launching processes in the background
     env_file:
     env_file:
