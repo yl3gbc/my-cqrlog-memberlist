@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   rigctld:
-    image: librespace/hamlib:latest
+    image: registry.gitlab.com/librespacefoundation/docker-hamlib/hamlib
     user: '999'
     read_only: true
     environment:
@@ -10,25 +10,43 @@ services:
     restart: 'unless-stopped'
     command: 'rigctld'
 
+  rotctld:
+    image: registry.gitlab.com/librespacefoundation/docker-hamlib/hamlib
+    user: '999'
+    read_only: true
+    environment:
+      MODEL: '1'
+      SET_CONF: 'min_az=0,max_az=360,min_el=0,max_el=180'
+    device_cgroup_rules:
+      - 'c 188:* rwm'
+    
+    restart: 'unless-stopped'
+    command: 'rotctld'
+    stop_grace_period: 1s
+
   satnogs_client:
-    #image: librespace/satnogs-client:master  # LSF stable docker image
-    #image: librespace/satnogs-client:master-unstable  # LSF experimental docker image
-    #image: librespace/satnogs-client:lsf-addons  # LSF stable + gr-satellites and addons
-    #image: librespace/satnogs-client:lsf-dev-addons  # LSF unstable + gr-satellites and addons
-    image: knegge/satnogs-client:1.9.3-addons
-    #image: knegge/satnogs-client:sa2kng-addons
+    #image: librespace/satnogs-client:master  # SatNOGS stable docker image
+    #image: librespace/satnogs-client:master-unstable  # SatNOGS experimental docker image
     #image: knegge/satnogs-client:lsf-dev-addons
+    #image: knegge/satnogs-client:lsf-addons
+    #image: knegge/satnogs-client:sa2kng-addons
+    image: knegge/satnogs-client:sa2kng
+    
     user: '999'
     #read_only: true
-    command: liveupdate-satyaml.sh satnogs-client
-    init: true  # init is needed when launching processes in the background
-    env_file:
+    init: true # init is needed when lauching processes in the background
     env_file:
       - ./station.env
     environment:
       SATNOGS_RIG_IP: 'rigctld'
       SATNOGS_RIG_PORT: '4532'
-    command: 'satnogs-client'  # default
+    #  SATNOGS_ROT_MODEL: 'ROT_MODEL_xxxx'
+    #  SATNOGS_ROT_PORT: 'dev'
+    #  SATNOGS_ROT_BAUD: '9600'
+    #  SATNOGS_ROT_THRESHOLD: '4'
+
+    #command: 'satnogs-client' # default
+    command: 'liveupdate-satyaml.sh satnogs-client'
     device_cgroup_rules:
       - 'c 189:* rwm'
     devices:
@@ -43,5 +61,5 @@ services:
     stop_grace_period: 1s
 
 volumes:
-  satnogs-client:  # persistent named volume for the station
+  satnogs-client: # persistent named volume for the station
 
